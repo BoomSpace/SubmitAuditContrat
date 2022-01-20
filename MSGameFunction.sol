@@ -124,14 +124,18 @@ contract MSGameFunction is Ownable{
 
         for (uint8 i = 0; i < amount; i++)
         {
-            if(FeeTo != address(0)) 
+            if (msGameFunctionData.IsOpenBlindBoxDisable(quality)==false)
             {
-                feeAll = feeAll.add(fee);
-                msSpaceToken.msTransferFrom(msg.sender, FeeTo, fee);
+                if(FeeTo != address(0)) 
+                {
+                    feeAll = feeAll.add(fee);
+                    msSpaceToken.msTransferFrom(msg.sender, FeeTo, fee);
+                }
+                
+                msGameFunctionData.AddOpenllBlindBoxCntCur(quality);
+                msSpaceToken.msTransferFrom(msg.sender, msGameFunctionData.getVaultAddress(), SpacePrice.sub(fee));
+                nftIDArray[i] = msGemoNft.msMint(msg.sender);                 
             }
-            msGameFunctionData.AddPreSellBlindBoxCntCur(quality);
-            msSpaceToken.msTransferFrom(msg.sender, msGameFunctionData.getVaultAddress(), SpacePrice.sub(fee));
-            nftIDArray[i] = msGemoNft.msMint(msg.sender); 
         }
 
 	    emit ev_OpenBlindBoxBySpaceForGemoNftArray( nftIDArray, 

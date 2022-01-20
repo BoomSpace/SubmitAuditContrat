@@ -10,29 +10,26 @@ contract MSGameFunctionData is IMSGameFunctionData, Ownable, AccessControl {
     bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR_ROLE");
     using SafeMath for uint256;
 
-    address     vaultAddress;
-    uint8       openBBXBySpaceFeeRate;
+    address     public vaultAddress;
+    uint8       public openBBXBySpaceFeeRate;
 
-    uint64      openBlindboxBeginTime;
-    uint64      openBlindBoxEndTime;
+    uint64      public openBlindboxBeginTime;
+    uint64      public openBlindBoxEndTime;
 
-    uint256     openBlindBoxMaxCnt_lv1;
-    uint256     openBlindBoxCurCnt_lv1;
+    uint256     public openBlindBoxMaxCnt_lv1;
+    uint256     public openBlindBoxCurCnt_lv1;
 
-    uint256     openBlindBoxMaxCnt_lv2;
-    uint256     openBlindBoxCurCnt_lv2;
+    uint256     public openBlindBoxMaxCnt_lv2;
+    uint256     public openBlindBoxCurCnt_lv2;
 
-    uint256     openBlindBoxBySpacePrice_lv1;
-    uint256     openBlindBoxBySpacePrice_lv2;
+    uint256     public openBlindBoxBySpacePrice_lv1;
+    uint256     public openBlindBoxBySpacePrice_lv2;
 
-    uint256     overTimeBlockCnt;
+    uint256     public overTimeBlockCnt;
     
     
     constructor(
     uint8 _openBBXBySpaceFeeRate, 
-
-    uint64      _openBlindboxBeginTime,
-    uint64      _openBlindBoxEndTime,
 
     uint256     _openBlindBoxMaxCnt_lv1,
     uint256     _openBlindBoxMaxCnt_lv2,
@@ -41,10 +38,12 @@ contract MSGameFunctionData is IMSGameFunctionData, Ownable, AccessControl {
     uint256 _openBlindBoxBySpacePrice_lv2,
     address _vaultAddress, 
     uint256 _overTimeBlockCnt) {
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+        
         openBBXBySpaceFeeRate = _openBBXBySpaceFeeRate;
 
-        openBlindboxBeginTime =_openBlindboxBeginTime;
-        openBlindBoxEndTime =_openBlindBoxEndTime;
+        openBlindboxBeginTime =0;
+        openBlindBoxEndTime =0;
         
         openBlindBoxMaxCnt_lv1 =_openBlindBoxMaxCnt_lv1;
         openBlindBoxCurCnt_lv1 =0;
@@ -168,7 +167,7 @@ contract MSGameFunctionData is IMSGameFunctionData, Ownable, AccessControl {
         return re;
     }
 
-    function AddPreSellBlindBoxCntCur(uint8 lv) override external
+    function AddOpenllBlindBoxCntCur(uint8 lv) override external
     {
         require(hasRole(OPERATOR_ROLE, _msgSender()), "Caller is not a operator");
         lv == 1?    openBlindBoxCurCnt_lv1 = openBlindBoxCurCnt_lv1.add(1):

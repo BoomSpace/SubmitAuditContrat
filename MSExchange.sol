@@ -4,7 +4,7 @@ import "./IMSSpaceToken.sol";
 import "./IMSNft.sol";
 import "./IMSExchangeData.sol";
 import "./IMSLibrary.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -14,7 +14,7 @@ contract MSExchange is Ownable {
     IMSNft private msGemoNft;
     IMSExchangeData private msExchangeData;
     IMSLibrary public msLibrary;
-    ERC20 USTDToken;
+    IERC20 USTDToken;
     address private signerAddress;
     constructor( 
         address _USTDToken,
@@ -23,7 +23,7 @@ contract MSExchange is Ownable {
         address _IMSLibrary,
         address _signerAddress
         ) {
-        USTDToken       = ERC20(_USTDToken);
+        USTDToken       = IERC20(_USTDToken);
         msGemoNft       = IMSNft(_IMSGemoNft);
         msExchangeData  = IMSExchangeData(_IExchangeData);
         msLibrary  = IMSLibrary(_IMSLibrary); 
@@ -42,6 +42,7 @@ contract MSExchange is Ownable {
     );
 
     event ev_buyNft(
+        uint8   isValid,
         uint256 indexed nftID,
         uint256  sellPrice,
         address indexed seller,
@@ -103,7 +104,7 @@ contract MSExchange is Ownable {
             retNftID = 0;
 
         msExchangeData.buyNftFinish(nftID);
-        emit ev_buyNft(retNftID, sellPrice, seller, msg.sender);
+        emit ev_buyNft(retNftID == nftID? 1:0, retNftID, sellPrice, seller, msg.sender);
     }
 
     function openPreSellBlindBox(
@@ -115,7 +116,8 @@ contract MSExchange is Ownable {
         require(USTDToken.balanceOf(msg.sender) >= price, "Your balance is not enough");
         require(msExchangeData.IsPreSellBlindBoxDisable(quality)==false, "pre sell blindbox is over");
 
-        uint256 fee = 0;
+        uint256 fee = 0;    
+        msExchangeData.AddPreSellBlindBoxCntCur(quality);
         if (FeeTo != address(0))
         {
             bytes32 hash = msLibrary.MSSecret(1, 0, FeeTo, 0);
@@ -123,10 +125,9 @@ contract MSExchange is Ownable {
             require(_signer == signerAddress, "invalid signer");
 
             fee = price.mul( msExchangeData.get_preSell_BlindBox_FeeRate()).div(100);
+            USTDToken.transferFrom(msg.sender, FeeTo, fee);
         }
-        
-        msExchangeData.AddPreSellBlindBoxCntCur(quality);
-        USTDToken.transferFrom(msg.sender, FeeTo, fee);
+
         USTDToken.transferFrom(msg.sender, msExchangeData.GetVaultAddress(), price.sub(fee));
         uint256 nftID = msGemoNft.msMint(msg.sender);
         

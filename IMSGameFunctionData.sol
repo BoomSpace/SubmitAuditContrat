@@ -15,5 +15,5 @@ interface IMSGameFunctionData {
     function getOpenBlindBoxBySpacePrice_lv2() external view returns(uint256);    
     function GetOverTimeBlockCnt() external view  returns(uint256);
     function IsOpenBlindBoxDisable(uint8 lv) external view returns(bool);
-    function AddPreSellBlindBoxCntCur(uint8 lv) external;
+    function AddOpenllBlindBoxCntCur(uint8 lv) external;
 }

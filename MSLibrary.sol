@@ -5,9 +5,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MSLibrary is IMSLibrary, Ownable {
 
-    uint256 private key1 = 1395;
-    uint256 private key2 = 123;
-    uint256 private key3 = 862374;
+    uint256 private key1;
+    uint256 private key2;
+    uint256 private key3;
 
     function setKey(uint256 _key1, uint256 _key2, uint256 _key3) onlyOwner() external
     {
